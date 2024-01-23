@@ -12,7 +12,8 @@ export class HeroesService {
     private heroRepository: Repository<Hero>,
   ) {}
   create(createHeroDto: CreateHeroDto) {
-    return this.heroRepository.save(createHeroDto);
+    const newHero = this.heroRepository.create(createHeroDto);
+    return this.heroRepository.save(newHero);
   }
 
   findAll() {
