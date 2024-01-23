@@ -3,14 +3,16 @@ import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Hero } from './entities/hero.entity';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 
 @Injectable()
 export class HeroesService {
   constructor(
     @InjectRepository(Hero)
     private heroRepository: Repository<Hero>,
+    private dataSource: DataSource,
   ) {}
+
   create(createHeroDto: CreateHeroDto) {
     const newHero = this.heroRepository.create(createHeroDto);
     return this.heroRepository.save(newHero);
@@ -30,5 +32,12 @@ export class HeroesService {
 
   remove(id: number) {
     return this.heroRepository.delete(id);
+  }
+
+  async createMany(heroes: CreateHeroDto[]) {
+    await this.dataSource.transaction(async (manager) => {
+      manager.save(heroes[0]);
+      manager.save(heroes[1]);
+    });
   }
 }
