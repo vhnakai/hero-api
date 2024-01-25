@@ -5,9 +5,18 @@ export class Hero {
   @PrimaryGeneratedColumn('increment')
   id: number;
 
-  @Column()
+  @Column({ type: 'varying character', length: 120 })
   name: string;
 
-  @Column()
-  power: string;
+  @Column({ type: 'varying character', length: 120, unique: true })
+  heroName: string;
+
+  @Column({ type: 'datetime', nullable: true })
+  birthDate: Date;
+
+  @Column('float')
+  heigth: number;
+
+  @Column('float')
+  weigh: number;
 }
