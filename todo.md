@@ -1,5 +1,5 @@
 # List of whats has to do
 
-- [ ] tests all routes
-- [ ] authorization 
- 
+- [ ] Resolve test coverage
+- [ ] Authorization 
+- [ ] Superpower Module
