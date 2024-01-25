@@ -5,9 +5,24 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { Hero } from './entities/hero.entity';
 import { Repository } from 'typeorm';
 
-import { ModuleMocker, MockFunctionMetadata } from 'jest-mock';
-
-const moduleMocker = new ModuleMocker(global);
+const mokedHeroesList: Hero[] = [
+  {
+    id: 1,
+    name: 'Utena',
+    heroName: 'MagiaBaiser',
+    birthDate: new Date('1997-12-01T02:00:00.000Z'),
+    heigth: 160,
+    weigh: 56,
+  },
+  {
+    id: 2,
+    name: 'Kiwi',
+    heroName: 'MagiaLeo',
+    birthDate: new Date('1997-10-06T02:00:00.000Z'),
+    heigth: 154,
+    weigh: 40,
+  },
+];
 
 describe('HeroesController', () => {
   let controller: HeroesController;
@@ -23,24 +38,16 @@ describe('HeroesController', () => {
         HeroesService,
         {
           provide: token,
-          useValue: { create: jest.fn() },
+          useValue: {
+            create: jest.fn(),
+            find: jest.fn().mockResolvedValue(mokedHeroesList),
+            findOne: jest.fn(),
+            update: jest.fn(),
+            remove: jest.fn(),
+          },
         },
       ],
-    })
-      .useMocker((token) => {
-        const results = ['test1', 'test2'];
-        if (token === HeroesService) {
-          return { findAll: jest.fn().mockResolvedValue(results) };
-        }
-        if (typeof token === 'function') {
-          const mockMetadata = moduleMocker.getMetadata(
-            token,
-          ) as MockFunctionMetadata<any, any>;
-          const Mock = moduleMocker.generateFromMetadata(mockMetadata);
-          return new Mock();
-        }
-      })
-      .compile();
+    }).compile();
 
     service = module.get<HeroesService>(HeroesService);
     heroRepository = module.get<Repository<Hero>>(token);
@@ -58,5 +65,17 @@ describe('HeroesController', () => {
 
   it('HeroRepository should be defined', () => {
     expect(heroRepository).toBeDefined();
+  });
+
+  describe('findall', () => {
+    it('Should return a hero list entity successfully', async () => {
+      const result = await controller.findAll();
+      expect(result).toEqual(mokedHeroesList);
+    });
+
+    it('Should return a message of none hero', () => {
+      jest.spyOn(service, 'findAll').mockRejectedValue(new Error());
+      expect(controller.findAll()).rejects.toThrow();
+    });
   });
 });

@@ -19,4 +19,13 @@ export class Hero {
 
   @Column('float')
   weigh: number;
+
+  constructor(hero?: Partial<Hero>) {
+    this.id = hero?.id;
+    this.name = hero?.name;
+    this.heroName = hero?.heroName;
+    this.birthDate = hero?.birthDate;
+    this.heigth = hero?.heigth;
+    this.weigh = hero?.weigh;
+  }
 }
