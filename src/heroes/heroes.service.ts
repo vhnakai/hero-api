@@ -66,7 +66,12 @@ export class HeroesService {
     return this.heroRepository.update(id, updateHeroDto);
   }
 
-  remove(id: number) {
+  async remove(id: number) {
+    const hero = await this.heroRepository.findOneBy({ id: id });
+
+    if (!hero) {
+      throw new HttpException('id was not found', HttpStatus.NOT_FOUND);
+    }
     return this.heroRepository.delete(id);
   }
 
