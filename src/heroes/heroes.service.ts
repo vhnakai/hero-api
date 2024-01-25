@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateHeroDto } from './dto/create-hero.dto';
 import { UpdateHeroDto } from './dto/update-hero.dto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -18,9 +18,10 @@ export class HeroesService {
     });
 
     if (UniqueHeroNameHandler.length > 0) {
-      return {
-        message: 'Sorry, but that hero name is been used already!',
-      };
+      throw new HttpException(
+        'Sorry, but that hero name is been used already!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const newHero = this.heroRepository.create(createHeroDto);
@@ -31,10 +32,10 @@ export class HeroesService {
     const heroes = await this.heroRepository.find();
 
     if (heroes.length === 0) {
-      return {
-        message:
-          'Any one can be a hero, please register one, because we dont have any heroes on our database',
-      };
+      throw new HttpException(
+        'Any one can be a hero, please register one, because we dont have any heroes on our database',
+        HttpStatus.OK,
+      );
     }
     return heroes;
   }
@@ -43,9 +44,7 @@ export class HeroesService {
     const hero = await this.heroRepository.findOneBy({ id: id });
 
     if (!hero) {
-      return {
-        message: 'id was not found ',
-      };
+      throw new HttpException('id was not found', HttpStatus.NOT_FOUND);
     }
     return hero;
   }
@@ -58,9 +57,10 @@ export class HeroesService {
     });
 
     if (UniqueHeroNameHandler.length > 0) {
-      return {
-        message: 'Sorry, but that hero name is been used already!',
-      };
+      throw new HttpException(
+        'Sorry, but that hero name is been used already!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     return this.heroRepository.update(id, updateHeroDto);
@@ -79,9 +79,10 @@ export class HeroesService {
     );
 
     if (findSomeEqualHeroName) {
-      return {
-        message: 'Sorry, but in this list, some heros name is repeated!',
-      };
+      throw new HttpException(
+        'Sorry, but in this list, some heros name is repeated!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const UniqueHeroNameHandler = await this.heroRepository.findBy({
@@ -89,10 +90,10 @@ export class HeroesService {
     });
 
     if (UniqueHeroNameHandler.length > 0) {
-      return {
-        message:
-          'Sorry, but in this list, some heros name has been used already!',
-      };
+      throw new HttpException(
+        'Sorry, but in this list, some heros name has been used already!',
+        HttpStatus.BAD_REQUEST,
+      );
     }
 
     const heroesEntities = heroes.map((hero) => {
